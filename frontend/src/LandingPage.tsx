@@ -1,14 +1,26 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import { roomIdAtom, roomNameAtom } from "./atom/atom";
+import { IoClipboardOutline } from "react-icons/io5";
 
 const LandingPage = () => {
   const [roomId, setRoomId] = useRecoilState(roomIdAtom);
   const [roomName, setRoomName] = useRecoilState(roomNameAtom);
+  const [error, setError] = useState("");
   const generateRoomId = () => {
     return Math.random().toString(36).substring(2, 10).toLocaleUpperCase();
   };
 
+  const roomRef = useRef<HTMLInputElement>(null);
+
+  const copyToClipboard = () => {
+    if (roomRef.current) {
+      roomRef.current.select();
+      roomRef.current.setSelectionRange(0, 99999); // For mobile devices
+      document.execCommand("copy");
+      alert("Copied the room ID: " + roomId);
+    }
+  };
   return (
     <div>
       <div className="bg-gradient-to-tl from-black via-slate-800 to-slate-900 h-screen w-screen flex items-center justify-center flex-wrap">
@@ -26,15 +38,23 @@ const LandingPage = () => {
               className="bg-transparent border-white/30 border-2 p-3 w-full text-white outline-none rounded-lg focus:border-white/60 transition-all duration-300"
               placeholder="Room Name"
               value={roomName || ""}
-              onChange={(e) => setRoomName(e.target.value)}
+              onChange={(e) => {
+                setRoomName(e.target.value);
+                setError(e.target.value ? "" : "Room name is required");
+              }}
             />
+            <div className="text-red-500 text-sm mt-1">{error}</div>
           </div>
-          <div className="mt-3">
+          <div className="mt-3 flex items-center gap-2 border-2 text-white rounded-lg border-white/30 p-1 focus:border-white/60 transition-all duration-300 bg-transparent">
             <input
-              className="bg-transparent border-white/30 border-2 p-3 w-full text-white outline-none rounded-lg focus:border-white/60 transition-all duration-300"
+              ref={roomRef}
+              className="bg-transparent  w-full p-2 text-white outline-none rounded-lg focus:border-white/60 transition-all duration-300"
               placeholder="Room ID"
               value={roomId || ""}
-              readOnly
+            />
+            <IoClipboardOutline
+              className="text-white h-10 w-5 mr-3"
+              onClick={copyToClipboard}
             />
           </div>
           <div className="mt-3">
