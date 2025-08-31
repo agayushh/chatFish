@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useRecoilState } from "recoil";
-import { roomIdAtom } from "./atom/atom";
+import { roomIdAtom, roomNameAtom } from "./atom/atom";
 
 const LandingPage = () => {
   const [roomId, setRoomId] = useRecoilState(roomIdAtom);
+  const [roomName, setRoomName] = useRecoilState(roomNameAtom);
   const generateRoomId = () => {
     return Math.random().toString(36).substring(2, 10).toLocaleUpperCase();
   };
+
   return (
     <div>
       <div className="bg-gradient-to-tl from-black via-slate-800 to-slate-900 h-screen w-screen flex items-center justify-center flex-wrap">
@@ -23,6 +25,8 @@ const LandingPage = () => {
             <input
               className="bg-transparent border-white/30 border-2 p-3 w-full text-white outline-none rounded-lg focus:border-white/60 transition-all duration-300"
               placeholder="Room Name"
+              value={roomName || ""}
+              onChange={(e) => setRoomName(e.target.value)}
             />
           </div>
           <div className="mt-3">

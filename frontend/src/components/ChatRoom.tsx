@@ -1,8 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { roomIdAtom, roomNameAtom } from "../atom/atom";
 
 function ChatRoom() {
   const [message, setMessage] = useState(["Hi there", "hello"]);
   const [inputMessage, setInputMessage] = useState("");
+  const roomId = useRecoilValue(roomIdAtom);
+  const roomName = useRecoilValue(roomNameAtom);
+
+
   const wsRef = useRef<WebSocket | null>(null);
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:8080");
@@ -31,7 +37,8 @@ function ChatRoom() {
       <div className="border-white border-2 h-auto w-[36vw]  rounded-md p-4">
         <div className="text-white text-4xl font-thin font-mono flex flex-col">
           ChatFish
-          <span className="text-base">RoomID: 123</span>
+          <span className="text-base">RoomID: {roomId}</span>
+          <span className="text-base">Room Name: {roomName}</span>
           <span className="w-full border-b "></span>
           {/* text area */}
           <div className="border-white p-2 mt-3 h-[60vh] overflow-auto">
