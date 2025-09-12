@@ -14,7 +14,7 @@ wss.on("connection", (socket) => {
   try {
     socket.on("message", (message: string) => {
       const parsedMessage = JSON.parse(message);
-      if (parsedMessage === "") {
+      if (!parsedMessage || !parsedMessage.type) {
         console.log("enter something mate");
       }
 
@@ -36,7 +36,7 @@ wss.on("connection", (socket) => {
         const room = socketToRoom.get(socket);
         if (room) {
           roomToSocket.get(room)?.forEach((x) => {
-            x.send(parsedMessage.payload.message);
+            if (x !== socket) x.send(parsedMessage.payload.message);
           });
         }
       }
@@ -56,9 +56,13 @@ wss.on("connection", (socket) => {
     });
     socket.on("close", () => {
       const room = socketToRoom.get(socket);
+
       socketToRoom.delete(socket);
       if (room && roomToSocket.has(room)) {
         roomToSocket.get(room)!.delete(socket);
+        roomToSocket
+          .get(room)
+          ?.forEach((x) => x.send(`User has closed the room`));
         if (roomToSocket.get(room)!.size === 0) {
           roomToSocket.delete(room);
         }
