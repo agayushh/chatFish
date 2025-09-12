@@ -11,6 +11,9 @@ importers:
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
+      hono:
+        specifier: ^4.9.5
+        version: 4.9.5
       ws:
         specifier: ^8.18.3
         version: 8.18.3
@@ -22,6 +25,10 @@ packages:
 
   '@types/ws@8.18.1':
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
+
+  hono@4.9.5:
+    resolution: {integrity: sha512-aLAVl5/67ifNnoFVxnhR89dpmSLsgwBprw/PT671ASwUpJqmd7Ne8KPTQo37DbRZfgpHaHeZ4bPVUvbOkeedMw==}
+    engines: {node: '>=16.9.0'}
 
   undici-types@7.10.0:
     resolution: {integrity: sha512-t5Fy/nfn+14LuOc2KNYg75vZqClpAiqscVvMygNnlsHBFpSXdJaYtXMcdNLpl/Qvc3P2cB3s6lOV51nqsFq4ag==}
@@ -47,6 +54,8 @@ snapshots:
   '@types/ws@8.18.1':
     dependencies:
       '@types/node': 24.3.0
+
+  hono@4.9.5: {}
 
   undici-types@7.10.0: {}
 

@@ -12,6 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "@types/ws": "^8.18.1",
+    "hono": "^4.9.5",
     "ws": "^8.18.3"
   }
 }

@@ -7,27 +7,64 @@ interface User {
   room: string;
 }
 
-let allSockets: User[] = [];
+const socketToRoom = new Map<WebSocket, string>();
+const roomToSocket = new Map<string, Set<WebSocket>>();
+// const userRoom = new Map<string, Set<WebSocket>>()
 wss.on("connection", (socket) => {
-  socket.on("message", (message) => {
-    //@ts-ignore
-    const parsedMessage = JSON.parse(message);
-    if (parsedMessage.type === "join") {
-      console.log(`you joined room ${parsedMessage.payload.roomId}`);
-      allSockets.push({
-        socket,
-        room: parsedMessage.payload.roomId,
-      });
-    }
-    if (parsedMessage.type === "chat") {
-      console.log("user wants to chat");
-      const currentUserRoom = allSockets.find((x) => x.socket === socket)?.room;
-      const allUserWithSameRoom = allSockets.filter(
-        (x) => x.room === currentUserRoom
-      );
-      allUserWithSameRoom.forEach((user) => {
-        user.socket.send(parsedMessage.payload.message);
-      });
-    }
-  });
+  try {
+    socket.on("message", (message: string) => {
+      const parsedMessage = JSON.parse(message);
+      if (parsedMessage === "") {
+        console.log("enter something mate");
+      }
+
+      if (parsedMessage.type === "join") {
+        if (socketToRoom.has(socket)) {
+          console.log(
+            "you are already in the room id",
+            socketToRoom.get(socket)
+          );
+        } else {
+          socketToRoom.set(socket, parsedMessage.payload.roomName);
+          if (!roomToSocket.has(parsedMessage.payload.roomName)) {
+            roomToSocket.set(parsedMessage.payload.roomName, new Set());
+          }
+          roomToSocket.get(parsedMessage.payload.roomName)!.add(socket);
+        }
+      }
+      if (parsedMessage.type === "chat") {
+        const room = socketToRoom.get(socket);
+        if (room) {
+          roomToSocket.get(room)?.forEach((x) => {
+            x.send(parsedMessage.payload.message);
+          });
+        }
+      }
+      if (parsedMessage.type === "leave") {
+        const room = socketToRoom.get(socket);
+        if (room) {
+          socketToRoom.delete(socket);
+          roomToSocket.get(room)?.delete(socket);
+          roomToSocket
+            .get(room)
+            ?.forEach((x) => x.send(`User has left the room from ${room}`));
+          if (roomToSocket.get(room)?.size === 0) {
+            roomToSocket.delete(room);
+          }
+        }
+      }
+    });
+    socket.on("close", () => {
+      const room = socketToRoom.get(socket);
+      socketToRoom.delete(socket);
+      if (room && roomToSocket.has(room)) {
+        roomToSocket.get(room)!.delete(socket);
+        if (roomToSocket.get(room)!.size === 0) {
+          roomToSocket.delete(room);
+        }
+      }
+    });
+  } catch (error) {
+    console.error(error);
+  }
 });
