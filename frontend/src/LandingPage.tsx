@@ -1,9 +1,11 @@
-import React, { useRef, useState } from "react";
+import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { roomIdAtom, roomNameAtom } from "./atom/atom";
 import { IoClipboardOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
+  const navigate = useNavigate()
   const [roomId, setRoomId] = useRecoilState(roomIdAtom);
   const [roomName, setRoomName] = useRecoilState(roomNameAtom);
   const [clientRoomId, setClientRoomId] = useState("");
@@ -57,6 +59,19 @@ const LandingPage = () => {
       hasError = true;
       setJoinError("Name is required to join a room");
     }
+
+    const ws = new WebSocket(`ws://localhost:8080?roomId=${clientRoomId}`);
+    ws.onopen = () => {
+      console.log("✅ Connected to WebSocket server");
+      navigate(`/chat/${clientRoomId}`, { state: { username: roomName } });
+    };
+
+    ws.onerror = (err) => {
+      console.error("❌ WebSocket error", err);
+      setError("Failed to connect to server");
+      hasError = true;
+    };
+
     if (hasError) return;
     console.log(`Hey ${clientName} room ${clientRoomId} `);
   };
