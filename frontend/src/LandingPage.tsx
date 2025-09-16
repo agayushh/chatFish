@@ -42,6 +42,17 @@ const LandingPage = () => {
       setError("Room name is required");
       isError = true;
     }
+    const ws = new WebSocket(`ws://localhost:8080?roomId=${roomId}`);
+    ws.onopen = () => {
+      console.log("✅ Connected to WebSocket server");
+      navigate(`/chat/${roomId}`, { state: { username: roomName } });
+    };
+
+    ws.onerror = (err) => {
+      console.error("❌ WebSocket error", err);
+      setError("Failed to connect to server");
+      isError = true;
+    };
     if (isError) return;
     console.log(`Room created with the roomId ${roomId} and name ${roomName}`);
   };
