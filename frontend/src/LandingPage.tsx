@@ -44,12 +44,12 @@ const LandingPage = () => {
     }
     const ws = new WebSocket(`ws://localhost:8080?roomId=${roomId}`);
     ws.onopen = () => {
-      console.log("✅ Connected to WebSocket server");
+      console.log("Connected to WebSocket server");
       navigate(`/chat/${roomId}`, { state: { username: roomName } });
     };
 
     ws.onerror = (err) => {
-      console.error("❌ WebSocket error", err);
+      console.error("WebSocket error", err);
       setError("Failed to connect to server");
       isError = true;
     };
@@ -73,12 +73,12 @@ const LandingPage = () => {
 
     const ws = new WebSocket(`ws://localhost:8080?roomId=${clientRoomId}`);
     ws.onopen = () => {
-      console.log("✅ Connected to WebSocket server");
+      console.log("Connected to WebSocket server");
       navigate(`/chat/${clientRoomId}`, { state: { username: roomName } });
     };
 
     ws.onerror = (err) => {
-      console.error("❌ WebSocket error", err);
+      console.error("WebSocket error", err);
       setError("Failed to connect to server");
       hasError = true;
     };

@@ -11,6 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@hono/node-server": "^1.19.3",
     "@types/ws": "^8.18.1",
     "hono": "^4.9.5",
     "ws": "^8.18.3"

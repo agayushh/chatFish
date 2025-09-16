@@ -1,68 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const ws_1 = require("ws");
-const wss = new ws_1.WebSocketServer({ port: 8080 });
-const socketToRoom = new Map();
-const roomToSocket = new Map();
-// const userRoom = new Map<string, Set<WebSocket>>()
-wss.on("connection", (socket) => {
-    try {
-        socket.on("message", (message) => {
-            var _a, _b, _c, _d;
-            const parsedMessage = JSON.parse(message);
-            if (!parsedMessage || !parsedMessage.type) {
-                console.log("enter something mate");
-            }
-            if (parsedMessage.type === "join") {
-                console.log("Welcome to the room");
-                if (socketToRoom.has(socket)) {
-                    console.log("you are already in the room id", socketToRoom.get(socket));
-                }
-                else {
-                    socketToRoom.set(socket, parsedMessage.payload.roomName);
-                    if (!roomToSocket.has(parsedMessage.payload.roomName)) {
-                        roomToSocket.set(parsedMessage.payload.roomName, new Set());
-                    }
-                    roomToSocket.get(parsedMessage.payload.roomName).add(socket);
-                }
-            }
-            if (parsedMessage.type === "chat") {
-                const room = socketToRoom.get(socket);
-                if (room) {
-                    (_a = roomToSocket.get(room)) === null || _a === void 0 ? void 0 : _a.forEach((x) => {
-                        if (x !== socket)
-                            x.send(parsedMessage.payload.message);
-                    });
-                }
-            }
-            if (parsedMessage.type === "leave") {
-                const room = socketToRoom.get(socket);
-                if (room) {
-                    socketToRoom.delete(socket);
-                    (_b = roomToSocket.get(room)) === null || _b === void 0 ? void 0 : _b.delete(socket);
-                    (_c = roomToSocket
-                        .get(room)) === null || _c === void 0 ? void 0 : _c.forEach((x) => x.send(`User has left the room from ${room}`));
-                    if (((_d = roomToSocket.get(room)) === null || _d === void 0 ? void 0 : _d.size) === 0) {
-                        roomToSocket.delete(room);
-                    }
-                }
-            }
-        });
-        socket.on("close", () => {
-            var _a;
-            const room = socketToRoom.get(socket);
-            socketToRoom.delete(socket);
-            if (room && roomToSocket.has(room)) {
-                roomToSocket.get(room).delete(socket);
-                (_a = roomToSocket
-                    .get(room)) === null || _a === void 0 ? void 0 : _a.forEach((x) => x.send(`User has closed the room`));
-                if (roomToSocket.get(room).size === 0) {
-                    roomToSocket.delete(room);
-                }
-            }
-        });
-    }
-    catch (error) {
-        console.error(error);
-    }
-});
+const websocket_1 = require("./websocket");
+const app_1 = __importDefault(require("./app"));
+const node_server_1 = require("@hono/node-server");
+const server = (0, node_server_1.serve)({ fetch: app_1.default.fetch, port: 8080 });
+(0, websocket_1.initWebSocket)(server);
+console.log(`Server is running at http://localhost:8080`);
