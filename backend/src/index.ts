@@ -19,6 +19,7 @@ wss.on("connection", (socket) => {
       }
 
       if (parsedMessage.type === "join") {
+        console.log("Welcome to the room")
         if (socketToRoom.has(socket)) {
           console.log(
             "you are already in the room id",
