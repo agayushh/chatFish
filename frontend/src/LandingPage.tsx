@@ -15,6 +15,10 @@ const LandingPage = () => {
   };
 
   const copyToClipboard = async () => {
+    if (!roomId || !roomId.trim()) {
+      alert("no room id to copy please generate one");
+      return;
+    }
     try {
       await navigator.clipboard.writeText(roomId || "");
       alert("Copied the room ID: " + roomId);
@@ -90,7 +94,11 @@ const LandingPage = () => {
               }}
             />
             <IoClipboardOutline
-              className="text-white h-10 w-5 mr-3"
+              className={`text-white h-10 w-5 mr-3 ${
+                !roomId || !roomId.trim()
+                  ? "text-gray-500 cursor-not-allowed"
+                  : "text-white hover:text-gray-300"
+              }`}
               onClick={copyToClipboard}
             />
           </div>
