@@ -42,23 +42,24 @@ export function initWebSocket(server: any) {
         if (parsedMessage.type === "join") {
           const roomName = parsedMessage.payload.roomName;
           console.log("Welcome to the room");
+          if (!roomToSocket.has(roomName)) {
+            socket.send(
+              JSON.stringify({
+                type: "error",
+                payload: { message: "Room not found" },
+              })
+            );
+            return;
+          }
+
+          roomToSocket.get(roomName)!.add(socket);
+          socketToRoom.set(socket, roomName);
           if (socketToRoom.has(socket)) {
             console.log(
               "you are already in the room id",
               socketToRoom.get(socket)
             );
           } else {
-            socketToRoom.set(socket, roomName);
-            if (!roomToSocket.has(roomName)) {
-              socket.send(
-                JSON.stringify({
-                  type: "error",
-                  payload: { message: "Room not found" },
-                })
-              );
-              return;
-            }
-            roomToSocket.get(roomName)!.add(socket);
             socketToRoom.set(socket, roomName);
             socket.send(
               JSON.stringify({ type: "joined", payload: { roomName } })
