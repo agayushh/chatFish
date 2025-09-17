@@ -1,7 +1,9 @@
 import { Hono } from "hono";
+import {cors} from "hono/cors";
 const app = new Hono();
 import { roomToSocket } from "./websocket";
 
+app.use("/*", cors());
 app.get("/", (c) => c.text("backend of the server is running"));
 
 app.get("/chat/:roomId", async (c) => {
