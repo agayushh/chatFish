@@ -66,7 +66,7 @@ export function initWebSocket(server: any) {
                 JSON.stringify({
                   type: "chat",
                   payload: { message: parsedMessage.payload.message },
-                  sender: "Anonymous",
+                  sender: "User",
                   timestamp: new Date().toISOString(),
                 })
               );
