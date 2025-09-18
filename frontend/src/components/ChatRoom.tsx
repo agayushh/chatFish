@@ -3,18 +3,28 @@ import { useRecoilValue } from "recoil";
 import { roomIdAtom, roomNameAtom } from "../atom/atom";
 
 function ChatRoom() {
-  const [message, setMessage] = useState(["Hi there", "hello"]);
+  const [message, setMessage] = useState([""]);
   const [inputMessage, setInputMessage] = useState("");
   const roomId = useRecoilValue(roomIdAtom);
   const roomName = useRecoilValue(roomNameAtom);
-
 
   const wsRef = useRef<WebSocket | null>(null);
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:8080");
     ws.onmessage = (event) => {
-      setMessage((m) => [...m, event.data]);
-      setInputMessage("");
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "joined") {
+          console.log(`Successfully joined room`);
+        } else if (data.type === " error") {
+          console.log("Websocket Error", data.message || data.payload?.message);
+        } else if (typeof data === "string") {
+          setMessage((prev) => [...prev, data]);
+        }
+      } catch (error) {
+        setMessage((prev) => [...prev, event.data]);
+      }
     };
     wsRef.current = ws;
     ws.onopen = () => {
@@ -22,7 +32,7 @@ function ChatRoom() {
         JSON.stringify({
           type: "join",
           payload: {
-            roomId: "red",
+            roomId: roomId,
           },
         })
       );
@@ -74,6 +84,7 @@ function ChatRoom() {
                         },
                       })
                     );
+                    setInputMessage("");
                   }
                 }}
               >
