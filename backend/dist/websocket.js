@@ -17,47 +17,49 @@ function initWebSocket(server) {
                     console.log("enter something mate");
                 }
                 if (parsedMessage.type === "create") {
-                    const roomName = parsedMessage.payload.roomName;
-                    if (exports.roomToSocket.has(roomName)) {
-                        console.log(`room with name ${roomName} already exists`);
+                    const roomId = parsedMessage.payload.roomId;
+                    if (exports.roomToSocket.has(roomId)) {
+                        console.log(`room with name ${roomId} already exists`);
                         socket.send(JSON.stringify({
                             type: "error",
                             message: "Room already exists",
                         }));
                         return;
                     }
-                    exports.roomToSocket.set(roomName, new Set([socket]));
-                    socketToRoom.set(socket, roomName);
-                    socket.send(JSON.stringify({ type: "created", payload: { roomName } }));
-                    console.log(`room with name ${roomName} created`);
+                    exports.roomToSocket.set(roomId, new Set([socket]));
+                    socketToRoom.set(socket, roomId);
+                    socket.send(JSON.stringify({ type: "created", payload: { roomId } }));
+                    console.log(`room with name ${roomId} created`);
                     return;
                 }
                 if (parsedMessage.type === "join") {
-                    const roomName = parsedMessage.payload.roomName;
+                    const roomId = parsedMessage.payload.roomId;
                     console.log("Welcome to the room");
-                    if (!exports.roomToSocket.has(roomName)) {
+                    if (!exports.roomToSocket.has(roomId)) {
                         socket.send(JSON.stringify({
                             type: "error",
                             payload: { message: "Room not found" },
                         }));
                         return;
                     }
-                    exports.roomToSocket.get(roomName).add(socket);
-                    socketToRoom.set(socket, roomName);
                     if (socketToRoom.has(socket)) {
-                        console.log("you are already in the room id", socketToRoom.get(socket));
+                        console.log("you are already in the room id");
                     }
-                    else {
-                        socketToRoom.set(socket, roomName);
-                        socket.send(JSON.stringify({ type: "joined", payload: { roomName } }));
-                    }
+                    exports.roomToSocket.get(roomId).add(socket);
+                    socketToRoom.set(socket, roomId);
+                    socket.send(JSON.stringify({ type: "joined", payload: { roomId } }));
                 }
                 if (parsedMessage.type === "chat") {
                     const room = socketToRoom.get(socket);
                     if (room) {
                         (_a = exports.roomToSocket.get(room)) === null || _a === void 0 ? void 0 : _a.forEach((x) => {
                             if (x !== socket)
-                                x.send(parsedMessage.payload.message);
+                                x.send(JSON.stringify({
+                                    type: "chat",
+                                    payload: { message: parsedMessage.payload.message },
+                                    sender: "Anonymous",
+                                    timestamp: new Date().toISOString(),
+                                }));
                         });
                     }
                 }
