@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { roomIdAtom, roomNameAtom } from "../atom/atom";
 import { useNavigate } from "react-router-dom";
+import { WS_BASE } from "../lib/constant";
 
 function ChatRoom() {
   const [message, setMessage] = useState<string[]>([]);
@@ -23,7 +24,7 @@ function ChatRoom() {
   }, [message]);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080");
+    const ws = new WebSocket(WS_BASE);
     
     ws.onmessage = (event) => {
       try {

@@ -3,8 +3,7 @@ import { useRecoilState } from "recoil";
 import { roomIdAtom, roomNameAtom } from "./atom/atom";
 import { IoClipboardOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-
-const API_BASE = "http://localhost:8080/api"; // your backend URL
+import { API_BASE } from "./lib/constant";
 
 const LandingPage = () => {
   const navigate = useNavigate();
